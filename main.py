@@ -44,14 +44,15 @@ while game_is_on:
         if ball.distance(brick) < 40 and ball.ycor() > 0:
             print(f"Brick hit @ {ball.position()}")
             scoreboard.update_points(value=brick.value)
+            scoreboard.update_session(1)
             wall.destroy_brick(wall.bricks.index(brick))
             if wall.all_bricks_destroyed():
                 print("Wall Destroyed!")
                 game_is_on = False
             # Speed increases after every 4 blocks are destroyed.
-            if wall.bin_count >= 4:
-                if wall.bin_count > ball.speed_level:
-                    ball.update_speed(4)
+            if scoreboard.session >= 4:
+                new_speed = int(scoreboard.session/4)
+                ball.increase_speed(new_speed)
 
             ball.bounce_y()
 
@@ -66,7 +67,7 @@ while game_is_on:
 
     # Detect collision with sidewalls
     if ball.xcor() > sidewalls or ball.xcor() < -sidewalls:
-        print(f"Sidewalls hit @ {ball.position()}")
+        print(f"Sidewalls hit @ {ball.position()}: {ball.heading()}")
         ball.bounce_x()
 
     # Detect collision with top_line
@@ -75,11 +76,11 @@ while game_is_on:
 
     # Detect collision with bottom - lose turn, game is off.
     if ball.ycor() < paddle_line:
-        print(f"Missed paddle {ball.position()}")
-        print(f"Paddle position @ {b_paddle.position()}")
+        print(f"Missed paddle {ball.position()}, Paddle position @ {b_paddle.position()}")
+        scoreboard.reset_session()
         ball.reset_position()
 
-    time.sleep(0.001)
+    time.sleep(.01)
 
 
 screen.exitonclick()
